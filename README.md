@@ -6,8 +6,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/nikepan/clickhouse-bulk)](https://goreportcard.com/report/github.com/nikepan/clickhouse-bulk)
 [![godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/nikepan/clickhouse-bulk)
 
-Simple [Yandex ClickHouse](https://clickhouse.yandex/) insert collector. It collect requests and send to ClickHouse servers.
-
+Simple [Yandex ClickHouse](https://clickhouse.yandex/) insert collector. It collect requests and send to ClickHouse
+servers.
 
 ### Installation
 
@@ -17,7 +17,6 @@ or
 
 [Use docker image](https://hub.docker.com/r/nikepan/clickhouse-bulk/)
 
-
 or from sources (Go 1.13+):
 
 ```text
@@ -26,8 +25,8 @@ cd clickhouse-bulk
 go build
 ```
 
-
 ### Features
+
 - Group n requests and send to any of ClickHouse server
 - Sending collected data by interval
 - Tested with VALUES, TabSeparated formats
@@ -36,24 +35,29 @@ go build
 - Supports other query parameters like username, password, database
 - Supports basic authentication
 
-
 For example:
+
 ```sql
-INSERT INTO table3 (c1, c2, c3) VALUES ('v1', 'v2', 'v3')
-INSERT INTO table3 (c1, c2, c3) VALUES ('v4', 'v5', 'v6')
-```
-sends as
-```sql
-INSERT INTO table3 (c1, c2, c3) VALUES ('v1', 'v2', 'v3')('v4', 'v5', 'v6')
+INSERT INTO table3 (c1, c2, c3)
+VALUES ('v1', 'v2', 'v3');
+INSERT INTO table3 (c1, c2, c3)
+VALUES ('v4', 'v5', 'v6');
 ```
 
+sends as
+
+```sql
+INSERT INTO table3 (c1, c2, c3)
+VALUES ('v1', 'v2', 'v3')('v4', 'v5', 'v6');
+```
 
 ### Options
+
 - -config - config file (json); default _config.json_
 
-
 ### Configuration file
-```javascript
+
+```json
 {
   "listen": ":8124",
   "flush_count": 10000, // check by \n char
@@ -96,15 +100,16 @@ INSERT INTO table3 (c1, c2, c3) VALUES ('v1', 'v2', 'v3')('v4', 'v5', 'v6')
 and send queries to :8124
 
 ### Metrics
+
 manual check main metrics
 `curl -s http://127.0.0.1:8124/metrics | grep "^ch_"`
+
 * `ch_bad_servers 0` - actual count of bad servers
 * `ch_dump_count 0` - dumps saved from launch
 * `ch_queued_dumps 0` - actual dump files id directory
 * `ch_good_servers 1` - actual good servers count
 * `ch_received_count 40` - received requests count from launch
 * `ch_sent_count 1` - sent request count from launch
-
 
 ### Tips
 
