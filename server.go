@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +15,7 @@ import (
 	"runtime"
 	"runtime/debug"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -41,7 +41,7 @@ func NewServer(listen string, collector *Collector, debug bool) *Server {
 }
 
 func (server *Server) writeHandler(c echo.Context) error {
-	q, _ := ioutil.ReadAll(c.Request().Body)
+	q, _ := io.ReadAll(c.Request().Body)
 	s := string(q)
 
 	if server.Debug {
@@ -88,12 +88,14 @@ func (server *Server) freeMemHandler(c echo.Context) error {
 func (server *Server) tablesCleanHandler(c echo.Context) error {
 	log.Printf("DEBUG: clean tables:\n%+v", server.Collector.Tables)
 	for k, t := range server.Collector.Tables {
-		log.Printf("DEBUG: check if table is empty: %+v with key:%+v\n", t, k)
-		if ok := t.Empty(); ok {
-			log.Printf("DEBUG: delete empty table: %+v with key:%+v\n", t, k)
-			server.Collector.Tables[k].CleanTable()
-			defer delete(server.Collector.Tables, k)
-		}
+		func() {
+			log.Printf("DEBUG: check if table is empty: %+v with key:%+v\n", t, k)
+			if ok := t.Empty(); ok {
+				log.Printf("DEBUG: delete empty table: %+v with key:%+v\n", t, k)
+				server.Collector.Tables[k].CleanTable()
+				defer delete(server.Collector.Tables, k)
+			}
+		}()
 	}
 	return c.JSON(200, Status{Status: "cleaned empty tables"})
 }
@@ -143,7 +145,7 @@ func SafeQuit(collect *Collector, sender Sender) {
 func RunServer(cnf Config) {
 	InitMetrics(cnf.MetricsPrefix)
 	dumper := NewDumper(cnf.DumpDir)
-	sender := NewClickhouse(cnf.Clickhouse.DownTimeout, cnf.Clickhouse.ConnectTimeout, cnf.Clickhouse.tlsServerName, cnf.Clickhouse.tlsSkipVerify)
+	sender := NewClickhouse(cnf.Clickhouse.DownTimeout, cnf.Clickhouse.ConnectTimeout, cnf.Clickhouse.TlsServerName, cnf.Clickhouse.TlsSkipVerify)
 	sender.Dumper = dumper
 	for _, url := range cnf.Clickhouse.Servers {
 		sender.AddServer(url)

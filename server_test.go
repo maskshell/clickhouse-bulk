@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/stretchr/testify/assert"
 )
@@ -90,7 +90,7 @@ func TestServer_MultiServer(t *testing.T) {
 
 	s1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
-		req, _ := ioutil.ReadAll(r.Body)
+		req, _ := io.ReadAll(r.Body)
 		mu.Lock()
 		defer mu.Unlock()
 		received = append(received, string(req))
@@ -99,7 +99,7 @@ func TestServer_MultiServer(t *testing.T) {
 
 	s2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "")
-		req, _ := ioutil.ReadAll(r.Body)
+		req, _ := io.ReadAll(r.Body)
 		mu.Lock()
 		defer mu.Unlock()
 		received = append(received, string(req))
