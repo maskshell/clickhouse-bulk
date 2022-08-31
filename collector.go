@@ -161,12 +161,13 @@ func (c *Collector) CleanTables() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for k, t := range c.Tables {
-		if t.lastUpdate.Add(time.Duration(c.CleanInterval) * time.Millisecond).Before(time.Now()) {
-			// table was not updated for CleanInterval - delete that table - otherwise it can cause memLeak
-			t.CleanTable()
-			defer delete(c.Tables, k)
-		}
-
+		func() {
+			if t.lastUpdate.Add(time.Duration(c.CleanInterval) * time.Millisecond).Before(time.Now()) {
+				// table was not updated for CleanInterval - delete that table - otherwise it can cause memLeak
+				t.CleanTable()
+				defer delete(c.Tables, k)
+			}
+		}()
 	}
 }
 

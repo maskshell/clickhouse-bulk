@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -47,7 +47,7 @@ type ClickhouseRequest struct {
 var ErrServerIsDown = errors.New("server is down")
 
 // ErrNoServers - signals about no working servers
-var ErrNoServers = errors.New("No working clickhouse servers")
+var ErrNoServers = errors.New("no working clickhouse servers")
 
 // NewClickhouse - get clickhouse object
 func NewClickhouse(downTimeout int, connectTimeout int, tlsServerName string, tlsSkipVerify bool) (c *Clickhouse) {
@@ -104,10 +104,10 @@ func (c *Clickhouse) DumpServers() {
 func (c *Clickhouse) GetNextServer() (srv *ClickhouseServer) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	tnow := time.Now()
+	timeNow := time.Now()
 	for _, s := range c.Servers {
 		if s.Bad {
-			if tnow.Sub(s.LastRequest) > time.Second*time.Duration(c.DownTimeout) {
+			if timeNow.Sub(s.LastRequest) > time.Second*time.Duration(c.DownTimeout) {
 				s.Bad = false
 			} else {
 				continue
@@ -204,7 +204,7 @@ func (srv *ClickhouseServer) SendQuery(r *ClickhouseRequest) (response string, s
 		if r.isInsert {
 			log.Printf("INFO: sent %+v rows to %+v of %+v\n", r.Count, srv.URL, r.Query)
 		}
-		buf, _ := ioutil.ReadAll(resp.Body)
+		buf, _ := io.ReadAll(resp.Body)
 		s := string(buf)
 		if resp.StatusCode >= 502 {
 			srv.Bad = true

@@ -12,10 +12,12 @@ const sampleConfig = "config.sample.json"
 
 type clickhouseConfig struct {
 	Servers        []string `json:"servers"`
-	tlsServerName  string   `json:"tls_server_name"`
-	tlsSkipVerify  bool     `json:"insecure_tls_skip_verify"`
+	TlsServerName  string   `json:"tls_server_name"`
+	TlsSkipVerify  bool     `json:"insecure_tls_skip_verify"`
 	DownTimeout    int      `json:"down_timeout"`
 	ConnectTimeout int      `json:"connect_timeout"`
+	UserName       string   `json:"user_name"`
+	Password       string   `json:"password"`
 }
 
 // Config stores config data
@@ -31,8 +33,8 @@ type Config struct {
 	Debug             bool             `json:"debug"`
 	MetricsPrefix     string           `json:"metrics_prefix"`
 	UseTLS            bool             `json:"use_tls"`
-	TLSCertFile				string           `json:"tls_cert_file"`
-	TLSKeyFile				string           `json:"tls_key_file"`
+	TLSCertFile       string           `json:"tls_cert_file"`
+	TLSKeyFile        string           `json:"tls_key_file"`
 }
 
 // ReadJSON - read json file to struct
@@ -85,7 +87,7 @@ func ReadConfig(configFile string) (Config, error) {
 	cnf := Config{}
 	err := ReadJSON(configFile, &cnf)
 	if err != nil {
-		log.Printf("INFO: Config file %+v not found. Used%+v\n", configFile, sampleConfig)
+		log.Printf("INFO: Config file %+v not found. Use %+v instead.\n", configFile, sampleConfig)
 		err = ReadJSON(sampleConfig, &cnf)
 		if err != nil {
 			log.Printf("ERROR: read %+v failed\n", sampleConfig)
@@ -100,8 +102,10 @@ func ReadConfig(configFile string) (Config, error) {
 	readEnvInt("DUMP_CHECK_INTERVAL", &cnf.DumpCheckInterval)
 	readEnvInt("CLICKHOUSE_DOWN_TIMEOUT", &cnf.Clickhouse.DownTimeout)
 	readEnvInt("CLICKHOUSE_CONNECT_TIMEOUT", &cnf.Clickhouse.ConnectTimeout)
-	readEnvBool("CLICKHOUSE_INSECURE_TLS_SKIP_VERIFY", &cnf.Clickhouse.tlsSkipVerify)
+	readEnvBool("CLICKHOUSE_INSECURE_TLS_SKIP_VERIFY", &cnf.Clickhouse.TlsSkipVerify)
 	readEnvString("METRICS_PREFIX", &cnf.MetricsPrefix)
+	readEnvString("CLICKHOUSE_USER_NAME", &cnf.Clickhouse.UserName)
+	readEnvString("CLICKHOUSE_PASSWORD", &cnf.Clickhouse.Password)
 
 	serversList := os.Getenv("CLICKHOUSE_SERVERS")
 	if serversList != "" {
@@ -111,7 +115,7 @@ func ReadConfig(configFile string) (Config, error) {
 
 	tlsServerName := os.Getenv("CLICKHOUSE_TLS_SERVER_NAME")
 	if tlsServerName != "" {
-		cnf.Clickhouse.tlsServerName = tlsServerName
+		cnf.Clickhouse.TlsServerName = tlsServerName
 	}
 
 	return cnf, err

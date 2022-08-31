@@ -19,7 +19,7 @@ const defaultDumpCheckInterval = 30
 const dumpResponseMark = "\n### RESPONSE ###\n"
 
 // ErrNoDumps - signal that dumps not found
-var ErrNoDumps = errors.New("No dumps")
+var ErrNoDumps = errors.New("no dumps")
 
 // Dumper - interface for dump data
 type Dumper interface {
@@ -74,7 +74,7 @@ func (d *FileDumper) Dump(params string, content string, response string, prefix
 		data += dumpResponseMark + response
 	}
 	d.DumpNum++
-	err = ioutil.WriteFile(
+	err = os.WriteFile(
 		path.Join(d.Path, d.dumpName(d.DumpNum, prefix, status)), []byte(data), 0644,
 	)
 	if err != nil {
@@ -118,8 +118,8 @@ func (d *FileDumper) GetDump() (string, error) {
 
 // GetDumpData - get dump data from filesystem
 func (d *FileDumper) GetDumpData(id string) (data string, response string, err error) {
-	path := d.makePath(id)
-	s, err := ioutil.ReadFile(path)
+	pathToRead := d.makePath(id)
+	s, err := os.ReadFile(pathToRead)
 	items := strings.Split(string(s), dumpResponseMark)
 	if len(items) > 1 {
 		return items[0], items[1], err
@@ -129,8 +129,8 @@ func (d *FileDumper) GetDumpData(id string) (data string, response string, err e
 
 // DeleteDump - get dump data from filesystem
 func (d *FileDumper) DeleteDump(id string) error {
-	path := d.makePath(id)
-	err := os.Remove(path)
+	pathToDelete := d.makePath(id)
+	err := os.Remove(pathToDelete)
 	return err
 }
 
@@ -143,14 +143,14 @@ func (d *FileDumper) ProcessNextDump(sender Sender) error {
 		return err
 	}
 	if err != nil {
-		return fmt.Errorf("Dump search error: %+v", err)
+		return fmt.Errorf("dump search error: %+v", err)
 	}
 	if f == "" {
 		return nil
 	}
 	data, _, err := d.GetDumpData(f)
 	if err != nil {
-		return fmt.Errorf("Dump read error: %+v", err)
+		return fmt.Errorf("dump read error: %+v", err)
 	}
 	if data != "" {
 		params := ""
@@ -170,7 +170,7 @@ func (d *FileDumper) ProcessNextDump(sender Sender) error {
 	err = d.DeleteDump(f)
 	if err != nil {
 		d.LockedFiles[f] = true
-		return fmt.Errorf("Dump delete error: %+v", err)
+		return fmt.Errorf("dump delete error: %+v", err)
 	}
 	return err
 }
