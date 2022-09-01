@@ -33,3 +33,5 @@ dumps
 clickhouse-bulk
 debug
 check.py
+
+*.env
