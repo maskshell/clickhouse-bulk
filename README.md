@@ -1,26 +1,29 @@
 # ClickHouse-Bulk
 
-[![build](https://github.com/nikepan/clickhouse-bulk/actions/workflows/test.yml/badge.svg)](https://github.com/nikepan/clickhouse-bulk/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/nikepan/clickhouse-bulk/branch/master/graph/badge.svg)](https://codecov.io/gh/nikepan/clickhouse-bulk)
-[![download binaries](https://img.shields.io/badge/binaries-download-blue.svg)](https://github.com/nikepan/clickhouse-bulk/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/nikepan/clickhouse-bulk)](https://goreportcard.com/report/github.com/nikepan/clickhouse-bulk)
-[![godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/nikepan/clickhouse-bulk)
+[![build](https://github.com/maskshell/clickhouse-bulk/actions/workflows/test.yml/badge.svg)](https://github.com/maskshell/clickhouse-bulk/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/maskshell/clickhouse-bulk/branch/master/graph/badge.svg)](https://codecov.io/gh/maskshell/clickhouse-bulk)
+[![download binaries](https://img.shields.io/badge/binaries-download-blue.svg)](https://github.com/maskshell/clickhouse-bulk/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/maskshell/clickhouse-bulk)](https://goreportcard.com/report/github.com/maskshell/clickhouse-bulk)
+[![godoc](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/maskshell/clickhouse-bulk)
 
-Simple [Yandex ClickHouse](https://clickhouse.yandex/) insert collector. It collect requests and send to ClickHouse
-servers.
+OLAP database [ClickHouse](https://clickhouse.com/) simple insert collector.
+
+It collects requests and send to ClickHouse servers.
 
 ### Installation
 
-[Download binary](https://github.com/nikepan/clickhouse-bulk/releases) for you platorm
+[Download binary](https://github.com/maskshell/clickhouse-bulk/releases) for you platorm
 
-or
+or use docker image:
 
-[Use docker image](https://hub.docker.com/r/nikepan/clickhouse-bulk/)
+```bash
+docker build -t clickhouse-bulk .
+```
 
 or from sources (Go 1.13+):
 
 ```text
-git clone https://github.com/nikepan/clickhouse-bulk
+git clone https://github.com/maskshell/clickhouse-bulk
 cd clickhouse-bulk
 go build
 ```
@@ -40,6 +43,7 @@ For example:
 ```sql
 INSERT INTO table3 (c1, c2, c3)
 VALUES ('v1', 'v2', 'v3');
+
 INSERT INTO table3 (c1, c2, c3)
 VALUES ('v4', 'v5', 'v6');
 ```
